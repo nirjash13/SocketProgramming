@@ -4,6 +4,6 @@ ExamServer/obj/
 Common/bin/
 Common/obj/
 ExamSystem.DataAccess/bin/
-ExamSystem/obj/
+ExamSystem.DataAccess/obj/
 Client/bin/
 Client/obj/
