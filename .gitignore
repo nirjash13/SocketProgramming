@@ -3,7 +3,7 @@ ExamServer/bin/
 ExamServer/obj/
 Common/bin/
 Common/obj/
-ExamSytem.DataAccess/bin/
-ExamSytem/obj/
+ExamSystem.DataAccess/bin/
+ExamSystem/obj/
 Client/bin/
 Client/obj/
