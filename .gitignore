@@ -1,0 +1,9 @@
+packages/
+ExamServer/bin/
+ExamServer/obj/
+Common/bin/
+Common/obj/
+ExamSytem.DataAccess/bin/
+ExamSytem/obj/
+Client/bin/
+Client/obj/
