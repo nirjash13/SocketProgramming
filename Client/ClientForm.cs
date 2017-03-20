@@ -24,7 +24,7 @@ namespace Client
             MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        private void ReceiveQuestionsFromServer(IAsyncResult AR)
+        private void ReceiveExamInfoFromServer(IAsyncResult AR)
         {
             try
             {
@@ -56,11 +56,11 @@ namespace Client
                });*/
 
 
-
+                var msg = StudentManager.GetConnectionMessageFromServer(buffer);
 
 
                 // Start receiving data again.
-                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveQuestionsFromServer, null);
+                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.ReceiveExamInfoFromServer, null);
             }
             
             catch (SocketException ex)
@@ -80,11 +80,7 @@ namespace Client
                 clientSocket.EndConnect(AR);
                 UpdateControlStates(true);
                 buffer = new byte[clientSocket.ReceiveBufferSize];
-
-                //var msg = StudentManager.GetConnectionMessageFromServer(buffer);
-
-
-                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveQuestionsFromServer, null);
+                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.ReceiveExamInfoFromServer, null);
             }
             catch (SocketException ex)
             {
@@ -168,17 +164,17 @@ namespace Client
         {
             try
             {
-                var studentId = Int32.Parse(textBoxStudent.Text);
+                //var studentId = Int32.Parse(textBoxStudent.Text);
                 var ip = textBoxAddress.Text;
 
 
 
-                var student = new StudentInformation();
+                /*var student = new StudentInformation();
                 student.StudentId = studentId;
                 student.IPAddress = ip;
                 student.OperationType = 0;
 
-                byte[] buffer = StudentManager.ConvertMessageToStudentInformation(student);
+                byte[] buffer = StudentManager.ConvertMessageToStudentInformation(student);*/
 
                 clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 // Connect to the specified host.
@@ -186,7 +182,7 @@ namespace Client
                 clientSocket.BeginConnect(endPoint, ReceiveCallBackMessageOnConnection, null);
 
 
-                clientSocket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, null);
+                //clientSocket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, null);
             }
             catch (SocketException ex)
             {
@@ -197,5 +193,7 @@ namespace Client
                 ShowErrorDialog(ex.Message);
             }
         }
+
+        
     }
 }
