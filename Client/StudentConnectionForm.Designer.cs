@@ -32,29 +32,29 @@
             this.textBox_studentId = new System.Windows.Forms.TextBox();
             this.button_ConnectToServer = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.button_SendInformation = new System.Windows.Forms.Button();
+            this.textBox_ServerIP = new System.Windows.Forms.TextBox();
+            this.label_ServerIp = new System.Windows.Forms.Label();
             this.splitContainer_QA = new System.Windows.Forms.SplitContainer();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.labelQuestion = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.label_AnswerQuestionsBelow = new System.Windows.Forms.Label();
             this.button_Answer = new System.Windows.Forms.Button();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.textBox_Question = new System.Windows.Forms.TextBox();
+            this.labelQuestion = new System.Windows.Forms.Label();
+            this.label_PrevAnsweredQuestion = new System.Windows.Forms.Label();
             this.listView1 = new System.Windows.Forms.ListView();
             this.AnsweredQuestionNumber = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.AnsweredQuestionText = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.label_AnswerQuestionsBelow = new System.Windows.Forms.Label();
-            this.label_PrevAnsweredQuestion = new System.Windows.Forms.Label();
-            this.textBox_ServerIP = new System.Windows.Forms.TextBox();
-            this.label_ServerIp = new System.Windows.Forms.Label();
-            this.button_SendInformation = new System.Windows.Forms.Button();
             this.label_InformationMesage = new System.Windows.Forms.TextBox();
-            this.textBox_Question = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer_QA)).BeginInit();
             this.splitContainer_QA.Panel1.SuspendLayout();
             this.splitContainer_QA.Panel2.SuspendLayout();
             this.splitContainer_QA.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // label_StudentId
@@ -77,7 +77,7 @@
             // 
             // button_ConnectToServer
             // 
-            this.button_ConnectToServer.Location = new System.Drawing.Point(512, 36);
+            this.button_ConnectToServer.Location = new System.Drawing.Point(511, 36);
             this.button_ConnectToServer.Name = "button_ConnectToServer";
             this.button_ConnectToServer.Size = new System.Drawing.Size(144, 36);
             this.button_ConnectToServer.TabIndex = 2;
@@ -94,7 +94,7 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 48.63523F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 51.36477F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 165F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 149F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150F));
             this.tableLayoutPanel1.Controls.Add(this.button_SendInformation, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.textBox_studentId, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.label_StudentId, 0, 0);
@@ -108,6 +108,33 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 54.66667F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(659, 75);
             this.tableLayoutPanel1.TabIndex = 3;
+            // 
+            // button_SendInformation
+            // 
+            this.button_SendInformation.Location = new System.Drawing.Point(3, 36);
+            this.button_SendInformation.Name = "button_SendInformation";
+            this.button_SendInformation.Size = new System.Drawing.Size(145, 36);
+            this.button_SendInformation.TabIndex = 5;
+            this.button_SendInformation.Text = "Send Information";
+            this.button_SendInformation.UseVisualStyleBackColor = true;
+            this.button_SendInformation.Visible = false;
+            this.button_SendInformation.Click += new System.EventHandler(this.button_SendInformation_Click);
+            // 
+            // textBox_ServerIP
+            // 
+            this.textBox_ServerIP.Location = new System.Drawing.Point(511, 3);
+            this.textBox_ServerIP.Name = "textBox_ServerIP";
+            this.textBox_ServerIP.Size = new System.Drawing.Size(144, 22);
+            this.textBox_ServerIP.TabIndex = 4;
+            // 
+            // label_ServerIp
+            // 
+            this.label_ServerIp.AutoSize = true;
+            this.label_ServerIp.Location = new System.Drawing.Point(346, 0);
+            this.label_ServerIp.Name = "label_ServerIp";
+            this.label_ServerIp.Size = new System.Drawing.Size(122, 17);
+            this.label_ServerIp.TabIndex = 3;
+            this.label_ServerIp.Text = "Server IP Address";
             // 
             // splitContainer_QA
             // 
@@ -129,6 +156,40 @@
             this.splitContainer_QA.SplitterDistance = 803;
             this.splitContainer_QA.TabIndex = 4;
             // 
+            // label_AnswerQuestionsBelow
+            // 
+            this.label_AnswerQuestionsBelow.AutoSize = true;
+            this.label_AnswerQuestionsBelow.Location = new System.Drawing.Point(15, 72);
+            this.label_AnswerQuestionsBelow.Name = "label_AnswerQuestionsBelow";
+            this.label_AnswerQuestionsBelow.Size = new System.Drawing.Size(169, 17);
+            this.label_AnswerQuestionsBelow.TabIndex = 3;
+            this.label_AnswerQuestionsBelow.Text = "Write your answers below";
+            // 
+            // button_Answer
+            // 
+            this.button_Answer.Location = new System.Drawing.Point(197, 483);
+            this.button_Answer.Name = "button_Answer";
+            this.button_Answer.Size = new System.Drawing.Size(129, 35);
+            this.button_Answer.TabIndex = 2;
+            this.button_Answer.Text = "Send Answer";
+            this.button_Answer.UseVisualStyleBackColor = true;
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.richTextBox1);
+            this.panel1.Location = new System.Drawing.Point(12, 112);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(581, 350);
+            this.panel1.TabIndex = 1;
+            // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Location = new System.Drawing.Point(3, 3);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(575, 344);
+            this.richTextBox1.TabIndex = 0;
+            this.richTextBox1.Text = "";
+            // 
             // tableLayoutPanel2
             // 
             this.tableLayoutPanel2.ColumnCount = 2;
@@ -143,6 +204,16 @@
             this.tableLayoutPanel2.Size = new System.Drawing.Size(534, 50);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
+            // textBox_Question
+            // 
+            this.textBox_Question.Enabled = false;
+            this.textBox_Question.Location = new System.Drawing.Point(92, 3);
+            this.textBox_Question.Multiline = true;
+            this.textBox_Question.Name = "textBox_Question";
+            this.textBox_Question.Size = new System.Drawing.Size(439, 44);
+            this.textBox_Question.TabIndex = 7;
+            this.textBox_Question.Text = "Your Question will appear here!";
+            // 
             // labelQuestion
             // 
             this.labelQuestion.AutoSize = true;
@@ -152,22 +223,14 @@
             this.labelQuestion.TabIndex = 0;
             this.labelQuestion.Text = "Questions";
             // 
-            // panel1
+            // label_PrevAnsweredQuestion
             // 
-            this.panel1.Controls.Add(this.richTextBox1);
-            this.panel1.Location = new System.Drawing.Point(12, 112);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(581, 350);
-            this.panel1.TabIndex = 1;
-            // 
-            // button_Answer
-            // 
-            this.button_Answer.Location = new System.Drawing.Point(197, 483);
-            this.button_Answer.Name = "button_Answer";
-            this.button_Answer.Size = new System.Drawing.Size(129, 35);
-            this.button_Answer.TabIndex = 2;
-            this.button_Answer.Text = "Send Answer";
-            this.button_Answer.UseVisualStyleBackColor = true;
+            this.label_PrevAnsweredQuestion.AutoSize = true;
+            this.label_PrevAnsweredQuestion.Location = new System.Drawing.Point(13, 27);
+            this.label_PrevAnsweredQuestion.Name = "label_PrevAnsweredQuestion";
+            this.label_PrevAnsweredQuestion.Size = new System.Drawing.Size(197, 17);
+            this.label_PrevAnsweredQuestion.TabIndex = 1;
+            this.label_PrevAnsweredQuestion.Text = "Previous Answered Questions";
             // 
             // listView1
             // 
@@ -180,58 +243,6 @@
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
-            // richTextBox1
-            // 
-            this.richTextBox1.Location = new System.Drawing.Point(3, 3);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(575, 344);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = "";
-            // 
-            // label_AnswerQuestionsBelow
-            // 
-            this.label_AnswerQuestionsBelow.AutoSize = true;
-            this.label_AnswerQuestionsBelow.Location = new System.Drawing.Point(15, 72);
-            this.label_AnswerQuestionsBelow.Name = "label_AnswerQuestionsBelow";
-            this.label_AnswerQuestionsBelow.Size = new System.Drawing.Size(169, 17);
-            this.label_AnswerQuestionsBelow.TabIndex = 3;
-            this.label_AnswerQuestionsBelow.Text = "Write your answers below";
-            // 
-            // label_PrevAnsweredQuestion
-            // 
-            this.label_PrevAnsweredQuestion.AutoSize = true;
-            this.label_PrevAnsweredQuestion.Location = new System.Drawing.Point(13, 27);
-            this.label_PrevAnsweredQuestion.Name = "label_PrevAnsweredQuestion";
-            this.label_PrevAnsweredQuestion.Size = new System.Drawing.Size(197, 17);
-            this.label_PrevAnsweredQuestion.TabIndex = 1;
-            this.label_PrevAnsweredQuestion.Text = "Previous Answered Questions";
-            // 
-            // textBox_ServerIP
-            // 
-            this.textBox_ServerIP.Location = new System.Drawing.Point(512, 3);
-            this.textBox_ServerIP.Name = "textBox_ServerIP";
-            this.textBox_ServerIP.Size = new System.Drawing.Size(144, 22);
-            this.textBox_ServerIP.TabIndex = 4;
-            // 
-            // label_ServerIp
-            // 
-            this.label_ServerIp.AutoSize = true;
-            this.label_ServerIp.Location = new System.Drawing.Point(347, 0);
-            this.label_ServerIp.Name = "label_ServerIp";
-            this.label_ServerIp.Size = new System.Drawing.Size(122, 17);
-            this.label_ServerIp.TabIndex = 3;
-            this.label_ServerIp.Text = "Server IP Address";
-            // 
-            // button_SendInformation
-            // 
-            this.button_SendInformation.Location = new System.Drawing.Point(3, 36);
-            this.button_SendInformation.Name = "button_SendInformation";
-            this.button_SendInformation.Size = new System.Drawing.Size(145, 36);
-            this.button_SendInformation.TabIndex = 5;
-            this.button_SendInformation.Text = "Send Information";
-            this.button_SendInformation.UseVisualStyleBackColor = true;
-            this.button_SendInformation.Visible = false;
-            // 
             // label_InformationMesage
             // 
             this.label_InformationMesage.Enabled = false;
@@ -241,16 +252,6 @@
             this.label_InformationMesage.Size = new System.Drawing.Size(482, 72);
             this.label_InformationMesage.TabIndex = 6;
             this.label_InformationMesage.Text = "Not Connected to Server!";
-            // 
-            // textBox_Question
-            // 
-            this.textBox_Question.Enabled = false;
-            this.textBox_Question.Location = new System.Drawing.Point(92, 3);
-            this.textBox_Question.Multiline = true;
-            this.textBox_Question.Name = "textBox_Question";
-            this.textBox_Question.Size = new System.Drawing.Size(439, 44);
-            this.textBox_Question.TabIndex = 7;
-            this.textBox_Question.Text = "Your Question will appear here!";
             // 
             // StudentConnectionForm
             // 
@@ -270,9 +271,9 @@
             this.splitContainer_QA.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer_QA)).EndInit();
             this.splitContainer_QA.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
-            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

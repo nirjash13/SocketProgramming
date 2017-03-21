@@ -1,6 +1,7 @@
 ﻿namespace Client
 {
     using System;
+    using System.IO;
     using System.Net;
     using System.Net.Sockets;
     using System.Windows.Forms;
@@ -122,5 +123,91 @@
                 this.label_InformationMesage.Text = text;
             }
         }
-    }
+
+        private void button_SendInformation_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var studentId = Int32.Parse(this.textBox_studentId.Text);
+                var ip = this.textBox_ServerIP.Text;
+
+                //TODO: add file Data
+
+                //var path = @"Answers/" + textBoxStudent.Text + "/answer.txt"; ;
+
+                //var fileData = File.ReadAllBytes(path);
+
+                var student = new StudentInformation();
+                student.StudentId = studentId;
+                student.IPAddress = ip;
+                student.OperationType = 1;
+                //student.FileData = fileData;
+
+
+
+
+                byte[] buffer = StudentManager.ConvertMessageToStudentInformation(student);
+
+                clientSocket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, ReceiveQuestionOnSendCallBack, null);
+
+                MessageBox.Show("Answers submitted to server", "Submission Successful", MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (SocketException ex)
+            {
+                ShowErrorDialog(ex.Message);
+                //UpdateQuestionPanelVisibility(false);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                ShowErrorDialog(ex.Message);
+                //UpdateQuestionPanelVisibility(false);
+            }
+        }
+
+        private void UpdateQuestionPanelVisibility(bool p0)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ReceiveQuestionOnSendCallBack(IAsyncResult ar)
+        {
+            try
+            {
+                int received = clientSocket.EndReceive(ar);
+
+                if (received == 0)
+                {
+                    return;
+                }
+
+
+                /* Invoke((Action)delegate
+                {
+                    Text = @"Server says: " + @"File Sent from server";
+                });*/
+
+
+                //var msg = StudentManager.GetConnectionMessageFromServer(buffer);
+
+
+                //TODO: receive question and send answers. and start listening for questions again. 
+                //UpdateQuestionPanelVisibility()
+
+
+                // Start receiving data again.
+                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.ReceiveQuestionOnSendCallBack, null);
+            }
+
+            catch (SocketException ex)
+            {
+                ShowErrorDialog(ex.Message);
+                //UpdateQuestionPanelVisibility(false);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                ShowErrorDialog(ex.Message);
+                //UpdateQuestionPanelVisibility(false);
+            }
+        }
 }
