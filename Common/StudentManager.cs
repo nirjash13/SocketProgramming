@@ -1,4 +1,6 @@
-﻿using Common.Models;
+﻿using System.Security.AccessControl;
+using System.Security.Principal;
+using Common.Models;
 using ExamSystem.DataAccess;
 using OnlineExamSystem.DataAccess;
 
@@ -24,7 +26,9 @@ namespace Common
         public static string StudentQuestionFolder;
 
 
-        private static Dictionary<int, StudentModel> ConnectedStudentList; 
+        private static Dictionary<int, StudentModel> ConnectedStudentList;
+
+        public static int BackUpIntervalInMinute { get; set; }
 
         static StudentManager()
         {
@@ -32,17 +36,29 @@ namespace Common
             dataService = new DataService();
             ConnectedStudentList = new Dictionary<int, StudentModel>();
 
-            var programData = System.Environment.
+            /*var programData = System.Environment.
                              GetFolderPath(
                                  Environment.SpecialFolder.CommonApplicationData
-                             );
-            StudentQuestionFolder = Path.Combine(programData, "StudentFolder");
+                             );*/
+
+            var programData = AppDomain.CurrentDomain.BaseDirectory;
+            StudentQuestionFolder = Path.Combine(programData, @"StudentFolder\Files");
+
+            StudentAnswerFolder = Path.Combine(programData, @"StudentFolder\Answers");
+
+            //StudentTempLocationQuestion = Path.Combine(programData, @"StudentFolder\Answers");
+
+            var BackUpIntervalInMinute = int.Parse(ConfigurationManager.AppSettings["BackUPInterval"]);
+
+
         }
+
+        public static string StudentAnswerFolder { get; set; }
 
         public static Dictionary<int, StudentInformation> StudentList { get; set; }
         public static string FullQuestionFilePath { get; set; }
 
-        public static byte[] ConvertMessageToStudentInformation(StudentInformation obj)
+        public static byte[] ConvertMessageToByteArray(StudentInformation obj)
         {
             if (obj == null) return null;
 
@@ -103,10 +119,12 @@ namespace Common
         public static byte[] GetConnectionMessageForStudent()
         {
             var msg = string.Format(
-                "Connection successful. Your exam will start on {0} and end on {1}",
-                GetStartTime().ToString(),
-                GetEndTime().ToString());
-            var connectionMessage = new ConnectionMessage() { CustomMessage = msg };
+                "Connection successful!");
+            var connectionMessage = new StudentInformation
+            {
+                ConnectionSuccessfulMessage = msg,
+                ServerOperationType = ServerOperationType.ConnectionSuccessful
+            };
 
             return GetByteArrayFromObject(connectionMessage);
         }
@@ -135,7 +153,7 @@ namespace Common
                 }
 
             }*/
-            if (student.OperationType == 1)
+            if (student.OperationType == OperationType.ClientAnswer)
             {
                 // TODO; file Save
                 var dirName = student.StudentId.ToString();
@@ -231,8 +249,9 @@ namespace Common
                 ExamTime = DateTime.UtcNow,
                 IsExamFinished = false,
                 IsBackupAvailable = false,
-                StudentIpAddress = studentInformation.IPAddress
-            };
+                StudentIpAddress = studentInformation.ServerIPAddress,
+                ActualAnswerFilePath = Path.Combine(StudentAnswerFolder, studentInformation.StudentId.ToString())
+        };
 
             ConnectedStudentList.Add(studentInformation.StudentId, studentModel);
         }
@@ -253,13 +272,29 @@ namespace Common
             var student = new StudentInformation
             {
                 StudentId = studentModel.StudentId,
-                IPAddress = studentModel.StudentIpAddress,
+                ServerIPAddress = studentModel.StudentIpAddress,
                    
             };
 
             return student;
         }
 
+
+        public static string GetStudentAnswerPath(int studentId)
+        {
+
+
+            StudentModel studentModel = null;
+
+            ConnectedStudentList.TryGetValue(studentId, out studentModel);
+
+            if (studentModel == null)
+            {
+                return null;
+            }
+
+            return studentModel.ActualAnswerFilePath;
+        }
         private static byte[] GetByteArrayFromObject(object obj)
         {
             if (obj == null) return null;
@@ -340,7 +375,7 @@ namespace Common
             var studentInfo = new StudentInformation
             {
                 StudentId = student.StudentId,
-                IPAddress = student.IPAddress,
+                ServerIPAddress = student.ServerIPAddress,
                 //ExamTime = student.ExamTime,
                 ExamStartTime = student.ExamStartTime,
                 ExamEndTime = student.ExamEndTime,
@@ -364,6 +399,28 @@ namespace Common
             student.ExamEndTime = GetEndTime();
 
             return GetByteArrayFromObject(student);
+        }
+
+        public static void CreateStudentDirectory(StudentInformation student)
+        {
+            var path = Path.Combine(StudentAnswerFolder, student.StudentId.ToString());
+
+            
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+                GrantAccess(path);
+
+            }
+        }
+
+
+        public static void GrantAccess(string fullPath)
+        {
+            DirectoryInfo dInfo = new DirectoryInfo(fullPath);
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
+            dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+            dInfo.SetAccessControl(dSecurity);
         }
     }
 }

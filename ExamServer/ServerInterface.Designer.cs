@@ -36,19 +36,19 @@ namespace ExamServer
             this.dateTimePicker_ExamStartTime = new System.Windows.Forms.DateTimePicker();
             this.label_ExamEndTime = new System.Windows.Forms.Label();
             this.button_SaveExamConfig = new System.Windows.Forms.Button();
-            this.panel_StudentInfo = new System.Windows.Forms.Panel();
-            this.label_ConnectedStudent = new System.Windows.Forms.Label();
-            this.dataGridView_StudentInfo = new System.Windows.Forms.DataGridView();
-            this.StudentId = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.StudentIp = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.richTextBox_DirectionForUser = new System.Windows.Forms.RichTextBox();
             this.button_OpenQuestionFile = new System.Windows.Forms.Button();
             this.openFileDialog_Question = new System.Windows.Forms.OpenFileDialog();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.richTextBox_ExamTimeInfo = new System.Windows.Forms.RichTextBox();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.label_StduentIDStartRange = new System.Windows.Forms.Label();
+            this.label_StudentIdEndRange = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
+            this.textBox_StduentIDStartRange = new System.Windows.Forms.TextBox();
+            this.textBox_StduentIDEndRange = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
-            this.panel_StudentInfo.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_StudentInfo)).BeginInit();
+            this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // label_ExamStartTime
@@ -77,6 +77,7 @@ namespace ExamServer
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(310, 83);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
@@ -119,47 +120,6 @@ namespace ExamServer
             this.button_SaveExamConfig.UseVisualStyleBackColor = true;
             this.button_SaveExamConfig.Click += new System.EventHandler(this.button_SaveExamConfig_Click);
             // 
-            // panel_StudentInfo
-            // 
-            this.panel_StudentInfo.Controls.Add(this.label_ConnectedStudent);
-            this.panel_StudentInfo.Controls.Add(this.dataGridView_StudentInfo);
-            this.panel_StudentInfo.Location = new System.Drawing.Point(51, 147);
-            this.panel_StudentInfo.Name = "panel_StudentInfo";
-            this.panel_StudentInfo.Size = new System.Drawing.Size(645, 450);
-            this.panel_StudentInfo.TabIndex = 2;
-            // 
-            // label_ConnectedStudent
-            // 
-            this.label_ConnectedStudent.AutoSize = true;
-            this.label_ConnectedStudent.Location = new System.Drawing.Point(32, 13);
-            this.label_ConnectedStudent.Name = "label_ConnectedStudent";
-            this.label_ConnectedStudent.Size = new System.Drawing.Size(104, 13);
-            this.label_ConnectedStudent.TabIndex = 1;
-            this.label_ConnectedStudent.Text = "Connected Students";
-            // 
-            // dataGridView_StudentInfo
-            // 
-            this.dataGridView_StudentInfo.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView_StudentInfo.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.StudentId,
-            this.StudentIp});
-            this.dataGridView_StudentInfo.Location = new System.Drawing.Point(32, 60);
-            this.dataGridView_StudentInfo.Name = "dataGridView_StudentInfo";
-            this.dataGridView_StudentInfo.Size = new System.Drawing.Size(326, 364);
-            this.dataGridView_StudentInfo.TabIndex = 0;
-            // 
-            // StudentId
-            // 
-            this.StudentId.HeaderText = "Student Id";
-            this.StudentId.Name = "StudentId";
-            this.StudentId.ReadOnly = true;
-            // 
-            // StudentIp
-            // 
-            this.StudentIp.HeaderText = "StudentIp";
-            this.StudentIp.Name = "StudentIp";
-            this.StudentIp.ReadOnly = true;
-            // 
             // richTextBox_DirectionForUser
             // 
             this.richTextBox_DirectionForUser.Location = new System.Drawing.Point(51, 12);
@@ -187,29 +147,94 @@ namespace ExamServer
             // richTextBox_ExamTimeInfo
             // 
             this.richTextBox_ExamTimeInfo.Enabled = false;
-            this.richTextBox_ExamTimeInfo.Location = new System.Drawing.Point(386, 112);
+            this.richTextBox_ExamTimeInfo.Location = new System.Drawing.Point(18, 215);
             this.richTextBox_ExamTimeInfo.Name = "richTextBox_ExamTimeInfo";
             this.richTextBox_ExamTimeInfo.Size = new System.Drawing.Size(310, 29);
             this.richTextBox_ExamTimeInfo.TabIndex = 5;
             this.richTextBox_ExamTimeInfo.Text = "";
+            // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.ColumnCount = 2;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.Controls.Add(this.textBox_StduentIDEndRange, 1, 1);
+            this.tableLayoutPanel2.Controls.Add(this.label_StduentIDStartRange, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.label_StudentIdEndRange, 0, 1);
+            this.tableLayoutPanel2.Controls.Add(this.button1, 1, 2);
+            this.tableLayoutPanel2.Controls.Add(this.textBox_StduentIDStartRange, 1, 0);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(386, 211);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 3;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 39F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(310, 94);
+            this.tableLayoutPanel2.TabIndex = 6;
+            // 
+            // label_StduentIDStartRange
+            // 
+            this.label_StduentIDStartRange.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label_StduentIDStartRange.AutoSize = true;
+            this.label_StduentIDStartRange.Location = new System.Drawing.Point(21, 7);
+            this.label_StduentIDStartRange.Name = "label_StduentIDStartRange";
+            this.label_StduentIDStartRange.Size = new System.Drawing.Size(113, 13);
+            this.label_StduentIDStartRange.TabIndex = 2;
+            this.label_StduentIDStartRange.Text = "StudentId Range Start";
+            // 
+            // label_StudentIdEndRange
+            // 
+            this.label_StudentIdEndRange.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label_StudentIdEndRange.AutoSize = true;
+            this.label_StudentIdEndRange.Location = new System.Drawing.Point(22, 34);
+            this.label_StudentIdEndRange.Name = "label_StudentIdEndRange";
+            this.label_StudentIdEndRange.Size = new System.Drawing.Size(110, 13);
+            this.label_StudentIdEndRange.TabIndex = 3;
+            this.label_StudentIdEndRange.Text = "StudentId Range End";
+            // 
+            // button1
+            // 
+            this.button1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.button1.Location = new System.Drawing.Point(195, 62);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "Save ";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // textBox_StduentIDStartRange
+            // 
+            this.textBox_StduentIDStartRange.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.textBox_StduentIDStartRange.Location = new System.Drawing.Point(182, 3);
+            this.textBox_StduentIDStartRange.Name = "textBox_StduentIDStartRange";
+            this.textBox_StduentIDStartRange.Size = new System.Drawing.Size(100, 20);
+            this.textBox_StduentIDStartRange.TabIndex = 5;
+            // 
+            // textBox_StduentIDEndRange
+            // 
+            this.textBox_StduentIDEndRange.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.textBox_StduentIDEndRange.Location = new System.Drawing.Point(182, 30);
+            this.textBox_StduentIDEndRange.Name = "textBox_StduentIDEndRange";
+            this.textBox_StduentIDEndRange.Size = new System.Drawing.Size(100, 20);
+            this.textBox_StduentIDEndRange.TabIndex = 6;
             // 
             // ServerInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(746, 642);
+            this.Controls.Add(this.tableLayoutPanel2);
             this.Controls.Add(this.richTextBox_ExamTimeInfo);
             this.Controls.Add(this.button_OpenQuestionFile);
             this.Controls.Add(this.richTextBox_DirectionForUser);
-            this.Controls.Add(this.panel_StudentInfo);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "ServerInterface";
             this.Text = "ServerInterface";
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
-            this.panel_StudentInfo.ResumeLayout(false);
-            this.panel_StudentInfo.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_StudentInfo)).EndInit();
+            this.tableLayoutPanel2.ResumeLayout(false);
+            this.tableLayoutPanel2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -220,11 +245,6 @@ namespace ExamServer
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label label_ExamEndTime;
         private System.Windows.Forms.Button button_SaveExamConfig;
-        private System.Windows.Forms.Panel panel_StudentInfo;
-        private System.Windows.Forms.DataGridView dataGridView_StudentInfo;
-        private System.Windows.Forms.DataGridViewTextBoxColumn StudentId;
-        private System.Windows.Forms.DataGridViewTextBoxColumn StudentIp;
-        private System.Windows.Forms.Label label_ConnectedStudent;
         private System.Windows.Forms.RichTextBox richTextBox_DirectionForUser;
         private System.Windows.Forms.Button button_OpenQuestionFile;
         private System.Windows.Forms.OpenFileDialog openFileDialog_Question;
@@ -232,5 +252,11 @@ namespace ExamServer
         private System.Windows.Forms.DateTimePicker dateTimePicker_ExamStartTime;
         private System.Windows.Forms.DateTimePicker dateTimePicker_ExamEndTime;
         private RichTextBox richTextBox_ExamTimeInfo;
+        private TableLayoutPanel tableLayoutPanel2;
+        private Label label_StduentIDStartRange;
+        private Label label_StudentIdEndRange;
+        private Button button1;
+        private TextBox textBox_StduentIDEndRange;
+        private TextBox textBox_StduentIDStartRange;
     }
 }

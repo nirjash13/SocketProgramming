@@ -13,7 +13,7 @@ namespace Client
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new StudentConnectionForm());
+            Application.Run(new StudentInterface());
         }
     }
 }

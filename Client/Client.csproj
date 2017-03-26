@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -58,6 +59,12 @@
     <Compile Include="StudentConnectionForm.Designer.cs">
       <DependentUpon>StudentConnectionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="StudentInterface.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StudentInterface.Designer.cs">
+      <DependentUpon>StudentInterface.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="ClientForm.resx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -70,6 +77,9 @@
     </Compile>
     <EmbeddedResource Include="StudentConnectionForm.resx">
       <DependentUpon>StudentConnectionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StudentInterface.resx">
+      <DependentUpon>StudentInterface.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

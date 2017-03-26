@@ -134,14 +134,14 @@ namespace Client
 
                 var student = new StudentInformation();
                 student.StudentId = studentId;
-                student.IPAddress = ip;
-                student.OperationType = 1;
+                student.ServerIPAddress = ip;
+                student.OperationType = OperationType.ClientAnswer;
                 //student.FileData = fileData;
 
 
 
 
-                byte[] buffer = StudentManager.ConvertMessageToStudentInformation(student);
+                byte[] buffer = StudentManager.ConvertMessageToByteArray(student);
 
                 clientSocket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, null);
 
@@ -171,10 +171,10 @@ namespace Client
 
                 /*var student = new StudentInformation();
                 student.StudentId = studentId;
-                student.IPAddress = ip;
+                student.ServerIPAddress = ip;
                 student.OperationType = 0;
 
-                byte[] buffer = StudentManager.ConvertMessageToStudentInformation(student);*/
+                byte[] buffer = StudentManager.ConvertMessageToByteArray(student);*/
 
                 clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 // Connect to the specified host.

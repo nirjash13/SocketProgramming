@@ -41,7 +41,7 @@
                 clientSocket.EndConnect(ar);
                 this.UpdateStudentInformationSendStates(true);
                 buffer = new byte[clientSocket.ReceiveBufferSize];
-                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.ReceiveExamInfoFromServer,
+                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.SendCallback,
                     null);
             }
             catch (SocketException ex)
@@ -74,7 +74,7 @@
             });
         }
 
-        private void ReceiveExamInfoFromServer(IAsyncResult ar)
+        private void SendCallback(IAsyncResult ar)
         {
             try
             {
@@ -107,7 +107,7 @@
 
 
                 // Start receiving data again.
-                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.ReceiveExamInfoFromServer,
+                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.SendCallback,
                     null);
             }
 
@@ -155,18 +155,29 @@
 
                 var student = new StudentInformation();
                 student.StudentId = studentId;
-                student.IPAddress = ip;
-                student.OperationType = 1;
+                student.ServerIPAddress = ip;
+                student.OperationType = OperationType.ClientConnect;
                 //student.FileData = fileData;
 
 
 
 
-                byte[] buffer = StudentManager.ConvertMessageToStudentInformation(student);
+                byte[] buffer = StudentManager.ConvertMessageToByteArray(student);
 
-                clientSocket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, ReceiveQuestionOnSendCallBack, null);
+               // clientSocket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, ReceiveQuestionOnSendCallBack, null);
 
-                MessageBox.Show("Answers submitted to server", "Submission Successful", MessageBoxButtons.OK,
+
+                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                // Connect to the specified host.
+                var endPoint = new IPEndPoint(IPAddress.Parse(ip), 3333);
+                clientSocket.BeginConnect(endPoint, ConnectCallback, null);
+
+
+                clientSocket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, null);
+
+
+
+                MessageBox.Show("Student Id submitted to server", "Submission Successful", MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
             }
             catch (SocketException ex)
@@ -181,53 +192,39 @@
             }
         }
 
-        private void UpdateQuestionPanelVisibility(bool p0)
-        {
-            throw new NotImplementedException();
-        }
 
-        private void ReceiveQuestionOnSendCallBack(IAsyncResult ar)
+        private void ConnectCallback(IAsyncResult AR)
         {
             try
             {
-                int received = clientSocket.EndReceive(ar);
+                clientSocket.EndConnect(AR);
+
+                int received = clientSocket.EndReceive(AR);
 
                 if (received == 0)
                 {
                     return;
                 }
 
+                var studentInfo = StudentManager.ExtractStudentInformationFromClientMsg(buffer);
 
-                /* Invoke((Action)delegate
-                {
-                    Text = @"Server says: " + @"File Sent from server";
-                });*/
-
-
-                //var msg = StudentManager.GetConnectionMessageFromServer(buffer);
-
-
-                //TODO: receive question and send answers. and start listening for questions again. 
-                //UpdateQuestionPanelVisibility()
-
-
-                // Start receiving data again.
-                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.ReceiveQuestionOnSendCallBack,
-                    null);
+                //UpdateControlStates(true);
+                buffer = new byte[clientSocket.ReceiveBufferSize];
+                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, null);
             }
-
             catch (SocketException ex)
             {
                 ShowErrorDialog(ex.Message);
-                //UpdateQuestionPanelVisibility(false);
             }
             catch (ObjectDisposedException ex)
             {
                 ShowErrorDialog(ex.Message);
-                //UpdateQuestionPanelVisibility(false);
             }
         }
 
+        
+
+        
         private void button_DownloadQuestion_Click(object sender, EventArgs e)
         {
 

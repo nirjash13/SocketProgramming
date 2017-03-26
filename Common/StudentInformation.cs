@@ -10,8 +10,10 @@ namespace Common
     [Serializable]
     public class StudentInformation
     {
-        public int OperationType { get; set; }
-        public string IPAddress { get; set; }
+        public OperationType OperationType { get; set; }
+
+        public ServerOperationType ServerOperationType { get; set; }
+        public string ServerIPAddress { get; set; }
         public int StudentId { get; set; }
         public DateTime ExamStartTime { get; set; }
 
@@ -32,6 +34,12 @@ namespace Common
         public bool IsQuestionPaperRequested { get; set; }
 
         public string ExamStartedMessage { get; set; }
+
+        public string ConnectionSuccessfulMessage { get; set; }
+
+        public int BackUpInterValInMinute { get; set; }
+
+        public bool  IsBackedUpAnswerAvailable { get; set; }
                
     }
 }

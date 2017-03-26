@@ -212,18 +212,6 @@ namespace ExamServer
             }
         }
 
-        private void SaveStudentInformation(StudentInformation studentInformation)
-        {
-            //var student = new StudentInformation();
-            StudentManager.SaveAnswerIntoServer(studentInformation);
-            if (studentInformation.OperationType == 1)
-            {
-                MessageBox.Show("Answers Received at Server. Please go to specific folder to read the answers",
-                    "File received!", MessageBoxButtons.OK);
-            }
-
-        }
-
         private void SubmitStudentToDataGrid(StudentInformation student)
         {
             /* Invoke((Action)delegate

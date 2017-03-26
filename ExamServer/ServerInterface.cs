@@ -23,20 +23,14 @@ namespace ExamServer
 
 
         private static string QuestionFilePath;
+
+        
         public ServerInterface()
         {
             InitializeComponent();
             StartServer();
 
         }
-
-
-
-        private static void ShowErrorDialog(string message)
-        {
-            MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
 
         private void StartServer()
         {
@@ -46,8 +40,7 @@ namespace ExamServer
                 serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 serverSocket.Bind(new IPEndPoint(IPAddress.Any, 3333));
                 serverSocket.Listen(10);
-                serverSocket.BeginAccept(AcceptCallbackOnConnect, null);
-                
+                serverSocket.BeginAccept(AcceptCallback, null);
             }
             catch (SocketException ex)
             {
@@ -59,25 +52,29 @@ namespace ExamServer
             }
         }
 
-        private void AcceptCallbackOnConnect(IAsyncResult AR)
+        private void AcceptCallback(IAsyncResult AR)
         {
             try
             {
                 clientSocket = serverSocket.EndAccept(AR);
+
+
+
                 buffer = new byte[clientSocket.ReceiveBufferSize];
 
-                /*var student = StudentManager.ExtractStudentInformationFromClientMsg(buffer);
 
-                StudentManager.SaveStudentInformation(student);
 
-                var sendData = StudentManager.GetConnectionMessageForStudent(student);*/
+                /*var sendData = new byte[2000];
 
-                var sendData = StudentManager.GetConnectionMessageForStudent(); ;
-                clientSocket.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, SendCallback, null);
+                //var sendData = Encoding.ASCII.GetBytes("Hello");
+                clientSocket.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, SendCallback, null);*/
+
+
+
                 // Listen for client data.
-                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveCallbackDataFromClient, null);
+                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveCallback, null);
                 // Continue listening for clients.
-                serverSocket.BeginAccept(AcceptCallbackOnConnect, null);
+                serverSocket.BeginAccept(AcceptCallback, null);
             }
             catch (SocketException ex)
             {
@@ -91,12 +88,10 @@ namespace ExamServer
 
         private byte[] ReadQuestionFile()
         {
-            var filePath = ConfigurationManager.AppSettings["filePath"];
-
-            var fullFilePath = AppDomain.CurrentDomain.BaseDirectory + filePath;
-            if (File.Exists(fullFilePath))
+            
+            if (File.Exists(StudentManager.FullQuestionFilePath))
             {
-                byte[] content = File.ReadAllBytes(filePath);
+                byte[] content = File.ReadAllBytes(StudentManager.FullQuestionFilePath);
                 return content;
 
             }
@@ -120,7 +115,7 @@ namespace ExamServer
             }
         }
 
-        private void ReceiveCallbackDataFromClient(IAsyncResult AR)
+        private void ReceiveCallback(IAsyncResult AR)
         {
             try
             {
@@ -132,57 +127,140 @@ namespace ExamServer
                     return;
                 }
 
-                /* var student = StudentManager.ExtractStudentInformationFromClientMsg(buffer);
-
-
-                 this.SaveStudentInformation(student);*/
-
-                //TO DO 
-                // SubmitStudentToDataGrid(student);  
-
-
-                //TODO: Send Questions from server to client
-
-                clientSocket = serverSocket.EndAccept(AR);
-                buffer = new byte[clientSocket.ReceiveBufferSize];
-
                 var student = StudentManager.ExtractStudentInformationFromClientMsg(buffer);
 
-
-                if (StudentManager.VerifyStudentId(student.StudentId))
+                student.ServerOperationType = ServerOperationType.ConnectionSuccessful;
+                if (student.OperationType == OperationType.ClientConnect)
                 {
-                    AddStudentToServerList(student);
-                    if (StudentManager.IsExamStarted())
+                    if (StudentManager.VerifyStudentId(student.StudentId))
                     {
-                        student.IsExamStarted = true;
-                        StartReceivingAnswers(student);
+                        student.IsStudentIdValid = true;
+
+                        student.ExamStartTime = StudentManager.examStartTime;
+                        student.ExamEndTime = StudentManager.examEndTime;
+
+                        if (StudentManager.IsExamStarted())
+                        {
+                            student.IsExamStarted = true;
+
+                            student.QuestionFileData = ReadQuestionFile();
+                            student.ServerOperationType = ServerOperationType.ServerQuestionFileSent;
+                            student.BackUpInterValInMinute = StudentManager.BackUpIntervalInMinute;
+
+
+                            student.ExamStartedMessage =
+                                string.Format("Your exam has started. please save the question file and answer!");
+                        }
+                        else
+                        {
+                            student.IsExamStarted = false;
+                            student.ServerOperationType = ServerOperationType.ServerExamInfo;
+                            
+
+                        }
+
+                        if (StudentManager.CheckIfStudentAlreadyConnectedOnce(student.StudentId))
+                        {
+                            student.IsAlreadyRegistered = true;
+                            student.QuestionFileData = GetLastBackedUpAnswer(ref student);
+
+                        }
+                        else
+                        {
+                            StudentManager.CreateStudentDirectory(student);
+                            StudentManager.AddStudentToList(student);
+
+                            
+                        }
+
+
+
                     }
                     else
                     {
-                        student.IsExamStarted = false;
-                        SendExamTimeToServer(student);
+                        student.IsStudentIdValid = false;
+                        student.StudentIdInvalidMessage =
+                            string.Format("Student Id invalid. please send a student id between a valid range!");
 
                     }
-                    
-                }
 
-                else
-                {
-                    var sendData = StudentManager.GetInValidStudentIdMessage(student);
 
-                    //var sendData = Encoding.ASCII.GetBytes("Connected To Server Successfully!");
+                    var sendData = StudentManager.ConvertMessageToByteArray(student);
+
+                    //var sendData = Encoding.ASCII.GetBytes("Hello");
                     clientSocket.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, SendCallback, null);
 
-
                     // Start receiving data again.
-                    clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveCallbackDataFromClient, null);
+                    clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveCallback, null);
+
+                }
+
+
+                else if(student.OperationType == OperationType.ClientAnswer)
+                {
+
+
+                    var path = Path.Combine(StudentManager.GetStudentAnswerPath(student.StudentId), "Answer.docx");
+
+
+                    if (!Directory.Exists(StudentManager.GetStudentAnswerPath(student.StudentId)))
+                    {
+                        Directory.CreateDirectory(StudentManager.GetStudentAnswerPath(student.StudentId));
+                    }
+
+                    StudentManager.GrantAccess(StudentManager.GetStudentAnswerPath(student.StudentId));
+
+
+                    //StudentManager.GrantAccess(path);
+
+                    try
+                    {
+                        File.WriteAllBytes(path, student.QuestionFileData);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString(), "Error!");
+                    }
+
+                }
+
+                else if (student.OperationType == OperationType.ClientBackupAnswer)
+                {
+
+
+                    var path = Path.Combine(StudentManager.GetStudentAnswerPath(student.StudentId), "Answer_Backup.docx");
+
+
+                    if (!Directory.Exists(StudentManager.GetStudentAnswerPath(student.StudentId)))
+                    {
+                        Directory.CreateDirectory(StudentManager.GetStudentAnswerPath(student.StudentId));
+                    }
+
+                    StudentManager.GrantAccess(StudentManager.GetStudentAnswerPath(student.StudentId));
+
+
+                    //StudentManager.GrantAccess(path);
+
+                    try
+                    {
+                        File.WriteAllBytes(path, student.QuestionFileData);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString(), "Error!");
+                    }
 
                 }
 
 
 
 
-                
+                //TODO 
+                // SubmitStudentToDataGrid(student);
+
+
             }
             // Avoid Pokemon exception handling in cases like these.
             catch (SocketException ex)
@@ -195,115 +273,29 @@ namespace ExamServer
             }
         }
 
-        private void SendExamTimeToServer(StudentInformation student)
+        private byte[] GetLastBackedUpAnswer(ref StudentInformation student)
         {
-            var sendData = StudentManager.GetExamTimeForStudent(student);
-
-            //var sendData = Encoding.ASCII.GetBytes("Connected To Server Successfully!");
-            clientSocket.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, SendCallback, null);
-
-
-            // Start receiving data again.
-            clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveAnswersFromClient, null);
-        }
-
-        private void AddStudentToServerList( StudentInformation student)
-        {
-            IPEndPoint remoteIpEndPoint = clientSocket.RemoteEndPoint as IPEndPoint;
-
-            if (remoteIpEndPoint != null)
+            var path = Path.Combine(StudentManager.GetStudentAnswerPath(student.StudentId), "Answer_Backup.docx");
+            if (File.Exists(path))
             {
-                // Using the RemoteEndPoint property.
-                student.IPAddress = remoteIpEndPoint.Address.ToString();
-            }
-
-            var studentExists = StudentManager.CheckIfStudentAlreadyConnectedOnce(student.StudentId);
-
-            if (!studentExists)
-            {
-                StudentManager.AddStudentToList(student);
+                student.IsBackedUpAnswerAvailable = true;
+                var data = File.ReadAllBytes(path);
+                return data;
             }
             else
             {
-                //TODO: Optional
+                student.IsBackedUpAnswerAvailable = false;
+                
+                return null;
             }
-        }
-
-        private void StartReceivingAnswers(StudentInformation student)
-        {
             
-
-            //student.IPAddress = studentIp.ToString();
-            //StudentManager.SaveStudentInformation(student);
-
-            var sendData = StudentManager.GetQuestionForStudent(student);
-
-            //var sendData = Encoding.ASCII.GetBytes("Connected To Server Successfully!");
-            clientSocket.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, SendCallback, null);
-
-
-            // Start receiving data again.
-            clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveAnswersFromClient, null);
-        }
-
-        private void ReceiveAnswersFromClient(IAsyncResult ar)
-        {
-            try
-            {
-
-                //TODO: Receive Answers from Client Here
-
-                /*int received = clientSocket.EndReceive(AR);
-
-                if (received == 0)
-                {
-                    return;
-                }
-
-                var student = StudentManager.ExtractStudentInformationFromClientMsg(buffer);
-
-
-                this.SaveStudentInformation(student);
-
-                //TO DO 
-                // SubmitStudentToDataGrid(student);  
-
-
-                //TODO: Send Questions from server to client
-
-                clientSocket = serverSocket.EndAccept(AR);
-                buffer = new byte[clientSocket.ReceiveBufferSize];
-
-                /*var student = StudentManager.ExtractStudentInformationFromClientMsg(buffer);
-
-                StudentManager.SaveStudentInformation(student);
-
-                var sendData = StudentManager.GetConnectionMessageForStudent(student);#1#
-
-                var sendData = Encoding.ASCII.GetBytes("Connected To Server Successfully!");
-                clientSocket.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, SendCallback, null);
-
-
-
-                // Start receiving data again.
-                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveAnswersFromClient, null);*/
-            }
-            // Avoid Pokemon exception handling in cases like these.
-            catch (SocketException ex)
-            {
-                ShowErrorDialog(ex.Message);
-            }
-            catch (ObjectDisposedException ex)
-            {
-                ShowErrorDialog(ex.Message);
-            }
         }
 
         private void SaveStudentInformation(StudentInformation studentInformation)
         {
             //var student = new StudentInformation();
-            StudentManager.SaveAnswerIntoServer(studentInformation);
-            if (studentInformation.OperationType == 1)
+            //StudentManager.CreateStudentDataInServer(studentInformation);
+            if (studentInformation.OperationType == OperationType.ClientAnswer)
             {
                 MessageBox.Show("Answers Received at Server. Please go to specific folder to read the answers",
                     "File received!", MessageBoxButtons.OK);
@@ -311,74 +303,74 @@ namespace ExamServer
 
         }
 
-        private void button_OpenQuestionFile_Click(object sender, EventArgs e)
+        private static void ShowErrorDialog(string message)
         {
-            this.openFileDialog_Question.Filter = "Doc files | *.docx";
-            openFileDialog_Question.Multiselect = false; // allow/deny user to upload more than one file at a time
-            if (openFileDialog_Question.ShowDialog() == DialogResult.OK) // if user clicked OK
-            {
-                String path = openFileDialog_Question.FileName; // get name of file
-                /*using (StreamReader reader = new StreamReader(new FileStream(path, FileMode.Open), new UTF8Encoding())) // do anything you want, e.g. read it
-                {
-                   
-                }*/
-
-                 
-
-                var systemPath = System.Environment.
-                             GetFolderPath(
-                                 Environment.SpecialFolder.CommonApplicationData
-                             );
-                var complete = Path.Combine(systemPath, @"ExamServer\files\");
-                QuestionFilePath = complete;
-                if (!Directory.Exists(complete))
-                {
-                    Directory.CreateDirectory(complete);
-                }
-
-                var fileName = @"Questions.docx";
-
-                StudentManager.FullQuestionFilePath = complete + fileName;
-
-                try
-                {
-                    File.Copy(path, complete + fileName, true);
-                }
-                catch (Exception ex)
-                {
-                    ShowErrorDialog("File can not be uploaded!");
-                }
-                MessageBox.Show("File Uploaded Successfully to server!");
-            }
+            MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void button_SaveExamConfig_Click(object sender, EventArgs e)
         {
-            var examStartTime = dateTimePicker_ExamStartTime.Value;
-            var examEndTime = dateTimePicker_ExamEndTime.Value;
+            var startTime = dateTimePicker_ExamStartTime.Value;
 
-            ConfigurationManager.AppSettings["StartTime"] = examStartTime.ToString("dd/MM/yyyy HH:mm");
-            ConfigurationManager.AppSettings["EndTime"] = examEndTime.ToString("dd/MM/yyyy HH:mm");
+            var endTime = dateTimePicker_ExamEndTime.Value;
 
-            StudentManager.examStartTime = examStartTime;
-            StudentManager.examEndTime = examEndTime;
+            ConfigurationManager.AppSettings["StartTime"] = startTime.ToString();
+            ConfigurationManager.AppSettings["EndTime"] = endTime.ToString();
 
-            richTextBox_ExamTimeInfo.Text = string.Format(@"Exam will start at {0} and will end at {1}",
-                examStartTime.ToString("dd/MM/yyyy HH:mm"), examEndTime.ToString("dd/MM/yyyy HH:mm"));
+            StudentManager.examStartTime = startTime;
+            StudentManager.examEndTime = endTime;
 
-            MessageBox.Show(
-                "Exam times have been set successfully. You can change it any time through application config file");
+            richTextBox_ExamTimeInfo.Text = string.Format("Exam will start at {0} and end at {1}", startTime.ToString(), endTime.ToString());
+
+
         }
 
-        /*private void SubmitStudentToDataGrid(StudentInformation student)
+        private void button_OpenQuestionFile_Click(object sender, EventArgs e)
         {
-            /* Invoke((Action)delegate
-             {
-                 dataGridView.Rows.Add(student.StudentId);
-             });#1#
-            var index = dataGridView.Rows.Add();
-            dataGridView.Rows[index].Cells["Column1"].Value = student.StudentId;
-            //DataGridViewRow row = (DataGridViewRow) dataGridView.Rows[0]
-        }*/
+
+            openFileDialog_Question.Filter = "Doc files|*.docx";
+            openFileDialog_Question.Title = "Select a Docx File";
+
+            string filePath = string.Empty;
+
+            // Show the Dialog.  
+            // If the user clicked OK in the dialog and  
+            // a .CUR file was selected, open it.  
+            if (openFileDialog_Question.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                // Assign the cursor in the Stream to the Form's Cursor property.  
+                filePath = openFileDialog_Question.FileName;
+            }
+
+            var fileName = ConfigurationManager.AppSettings["FilePath"];
+
+            var fullFilePath = Path.Combine(StudentManager.StudentQuestionFolder, fileName);
+            StudentManager.GrantAccess(fullFilePath);
+            if (!Directory.Exists(StudentManager.StudentQuestionFolder))
+            {
+                //StudentManager.GrantAccess(fullFilePath);
+                Directory.CreateDirectory(StudentManager.StudentQuestionFolder);
+            }
+            try
+            {
+                File.Copy(filePath, fullFilePath, true);
+                MessageBox.Show("Question uploaded");
+                StudentManager.FullQuestionFilePath = fullFilePath;
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error!");
+            }
+
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ConfigurationManager.AppSettings["StudentIdRangeStart"] = textBox_StduentIDStartRange.Text;
+            ConfigurationManager.AppSettings["StudentIdRangeEnd"] = textBox_StduentIDEndRange.Text;
+            MessageBox.Show("Student Id Range set successfully!");
+        }
     }
 }
