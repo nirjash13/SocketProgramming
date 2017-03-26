@@ -13,14 +13,14 @@ namespace ExamSystem.DataAccess
         {
             using (var context = new OnlineExamSystem())
             {
-                var dbQuestions = context.Questions.ToList();
+               /* var dbQuestions = context.Questions.ToList();
                 context.Questions.RemoveRange(dbQuestions);
 
                 //context.SaveChanges();
                 //dbQuestions = context.Questions.ToList();
                 context.Questions.AddRange(questions);
 
-                context.SaveChanges();
+                context.SaveChanges();*/
             }
             
         }

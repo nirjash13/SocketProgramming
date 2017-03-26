@@ -1,4 +1,5 @@
-﻿using ExamSystem.DataAccess;
+﻿using Common.Models;
+using ExamSystem.DataAccess;
 using OnlineExamSystem.DataAccess;
 
 namespace Common
@@ -16,17 +17,30 @@ namespace Common
     {
         private static DataService dataService;
 
-        private static DateTime examEndTime;
+        public static DateTime examEndTime;
 
-        private static DateTime examStartTime;
+        public static DateTime examStartTime;
+
+        public static string StudentQuestionFolder;
+
+
+        private static Dictionary<int, StudentModel> ConnectedStudentList; 
 
         static StudentManager()
         {
             StudentList = new Dictionary<int, StudentInformation>();
             dataService = new DataService();
+            ConnectedStudentList = new Dictionary<int, StudentModel>();
+
+            var programData = System.Environment.
+                             GetFolderPath(
+                                 Environment.SpecialFolder.CommonApplicationData
+                             );
+            StudentQuestionFolder = Path.Combine(programData, "StudentFolder");
         }
 
         public static Dictionary<int, StudentInformation> StudentList { get; set; }
+        public static string FullQuestionFilePath { get; set; }
 
         public static byte[] ConvertMessageToStudentInformation(StudentInformation obj)
         {
@@ -197,6 +211,55 @@ namespace Common
             return studentId >= studentIdStart && studentId <= studentIdEnd;
         }
 
+        public static bool CheckIfStudentAlreadyConnectedOnce(int studentId)
+        {
+            var studentExists = ConnectedStudentList.ContainsKey(studentId);
+            if (studentExists)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static void AddStudentToList(StudentInformation studentInformation)
+        {
+            var studentModel = new StudentModel
+            {
+                StudentId = studentInformation.StudentId,
+                ExamEndTime = studentInformation.ExamEndTime,
+                ExamStartTime = studentInformation.ExamStartTime,
+                ExamTime = DateTime.UtcNow,
+                IsExamFinished = false,
+                IsBackupAvailable = false,
+                StudentIpAddress = studentInformation.IPAddress
+            };
+
+            ConnectedStudentList.Add(studentInformation.StudentId, studentModel);
+        }
+
+        public static StudentInformation GetStudentInformationFromConnectedList(int studentId)
+        {
+            
+
+            StudentModel studentModel = null;
+
+            ConnectedStudentList.TryGetValue(studentId, out studentModel);
+
+            if (studentModel == null)
+            {
+                return null;
+            }
+
+            var student = new StudentInformation
+            {
+                StudentId = studentModel.StudentId,
+                IPAddress = studentModel.StudentIpAddress,
+                   
+            };
+
+            return student;
+        }
+
         private static byte[] GetByteArrayFromObject(object obj)
         {
             if (obj == null) return null;
@@ -240,5 +303,67 @@ namespace Common
         }
 
 
+        public static byte[] GetInValidStudentIdMessage(StudentInformation student)
+        {
+            student.IsStudentIdValid = false;
+            var studentIdStart = int.Parse(ConfigurationManager.AppSettings["StudentIdRangeStart"]);
+            var studentIdEnd = int.Parse(ConfigurationManager.AppSettings["StudentIdRangeEnd"]);
+
+            student.StudentIdInvalidMessage =
+                string.Format("Invalid Student Id! Please Send a valid studentId in the range from {0} to {1}",
+                    studentIdStart, studentIdEnd);
+
+            var data = GetByteArrayFromObject(student);
+
+            return data;
+        }
+
+        public static bool IsExamStarted()
+        {
+            var startTime = GetStartTime();
+            var endTime = GetEndTime();
+            var currentTime = DateTime.Now;
+            return currentTime >= startTime;
+        }
+
+        public static byte[] GetQuestionForStudent(StudentInformation student)
+        {
+            var file = FullQuestionFilePath;
+
+            var fileData = File.ReadAllBytes(file);
+
+            //var examStartedMessage =
+            //string.Format("Exam has started! Please save the question file and click finish when done!");
+
+            var examStartedMsg = string.Format("Your exam is started. please save the question file!");
+
+            var studentInfo = new StudentInformation
+            {
+                StudentId = student.StudentId,
+                IPAddress = student.IPAddress,
+                //ExamTime = student.ExamTime,
+                ExamStartTime = student.ExamStartTime,
+                ExamEndTime = student.ExamEndTime,
+                IsAlreadyRegistered = student.IsAlreadyRegistered,
+                IsExamStarted = student.IsExamStarted,
+                ExamStartedMessage = examStartedMsg,
+                IsStudentIdValid = student.IsStudentIdValid,
+                StudentAlreadyRegisteredMessage = student.StudentAlreadyRegisteredMessage,
+                QuestionFileData = fileData
+            };
+
+            var serverData = GetByteArrayFromObject(studentInfo);
+
+            return serverData;
+
+        }
+
+        public static byte[] GetExamTimeForStudent(StudentInformation student)
+        {
+            student.ExamStartTime = GetStartTime();
+            student.ExamEndTime = GetEndTime();
+
+            return GetByteArrayFromObject(student);
+        }
     }
 }

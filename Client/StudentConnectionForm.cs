@@ -41,7 +41,8 @@
                 clientSocket.EndConnect(ar);
                 this.UpdateStudentInformationSendStates(true);
                 buffer = new byte[clientSocket.ReceiveBufferSize];
-                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.ReceiveExamInfoFromServer, null);
+                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.ReceiveExamInfoFromServer,
+                    null);
             }
             catch (SocketException ex)
             {
@@ -60,7 +61,7 @@
 
         private void UpdateStudentInformationSendStates(bool toggle)
         {
-            Invoke((Action)delegate
+            Invoke((Action) delegate
             {
                 this.label_StudentId.Visible = toggle;
                 this.button_SendInformation.Enabled = toggle;
@@ -69,7 +70,7 @@
 
                 this.button_ConnectToServer.Enabled = !toggle;
                 this.label_ServerIp.Visible = this.textBox_ServerIP.Visible = !toggle;
-                
+
             });
         }
 
@@ -84,15 +85,30 @@
                     return;
                 }
 
-                var connectionMessage = StudentManager.GetConnectionMessageFromServer(buffer);
+                var studentInfo = StudentManager.ExtractStudentInformationFromClientMsg(buffer);
 
 
-                SetInformationText(connectionMessage.CustomMessage);
+                if (studentInfo.IsExamStarted)
+                {
+                    SetInformationText(studentInfo.ExamStartedMessage);
+
+                }
+                else
+                {
+                    var examTime = string.Format("Your exam will start at {0} and end at {1}",
+                        studentInfo.ExamStartTime.ToString(), studentInfo.ExamEndTime.ToString());
+                    SetInformationText(examTime);
+
+                }
+
+
+
                 //this.label_InformationMesage.Text = connectionMessage.CustomMessage;
 
 
                 // Start receiving data again.
-                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.ReceiveExamInfoFromServer, null);
+                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.ReceiveExamInfoFromServer,
+                    null);
             }
 
             catch (SocketException ex)
@@ -106,7 +122,7 @@
         }
 
 
-        delegate void SetTextCallback(string text);
+        private delegate void SetTextCallback(string text);
 
         private void SetInformationText(string text)
         {
@@ -116,7 +132,7 @@
             if (this.label_InformationMesage.InvokeRequired)
             {
                 SetTextCallback d = new SetTextCallback(SetInformationText);
-                this.Invoke(d, new object[] { text });
+                this.Invoke(d, new object[] {text});
             }
             else
             {
@@ -196,7 +212,8 @@
 
 
                 // Start receiving data again.
-                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.ReceiveQuestionOnSendCallBack, null);
+                clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, this.ReceiveQuestionOnSendCallBack,
+                    null);
             }
 
             catch (SocketException ex)
@@ -210,4 +227,10 @@
                 //UpdateQuestionPanelVisibility(false);
             }
         }
+
+        private void button_DownloadQuestion_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
 }

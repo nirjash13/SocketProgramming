@@ -19,7 +19,7 @@ namespace ExamServer
             //TO insert questions into db on start up
             StudentManager.SaveQuestionsIntoDatabaseFromFile();
 
-            Application.Run(new ServerForm());
+            Application.Run(new ServerInterface());
         }
     }
 }
